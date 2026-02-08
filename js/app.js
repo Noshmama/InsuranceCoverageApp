@@ -21,7 +21,13 @@ const App = {
     if (zipInput) {
       zipInput.addEventListener('input', (e) => {
         e.target.value = e.target.value.replace(/\D/g, '').slice(0, 5);
-        this.handleZipSearch(e.target.value);
+        const val = e.target.value;
+        if (val.length === 5) {
+          // Auto-analyze when 5 digits entered
+          this.analyzeZip(val);
+        } else {
+          this.handleZipSearch(val);
+        }
       });
       zipInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && e.target.value.length === 5) {
@@ -165,6 +171,11 @@ const App = {
     input.addEventListener('input', (e) => {
       e.target.value = e.target.value.replace(/\D/g, '').slice(0, 5);
       const query = e.target.value;
+      if (query.length === 5) {
+        suggestions.style.display = 'none';
+        this.analyzeZip(query);
+        return;
+      }
       if (query.length < 2) {
         suggestions.innerHTML = '';
         suggestions.style.display = 'none';
@@ -188,12 +199,6 @@ const App = {
           this.analyzeZip(item.dataset.zip);
         });
       });
-    });
-
-    input.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter' && e.target.value.length === 5) {
-        this.analyzeZip(e.target.value);
-      }
     });
 
     input.focus();
