@@ -24,11 +24,12 @@
   --top-bar-h:52px;
 }
 
-html{background:#c5cdd8;height:100%;}
+html{background:var(--bg);height:100%;}
 body{
   font-family:var(--sans);background:var(--bg);color:var(--text);line-height:1.5;
   max-width:var(--phone-w);margin:0 auto;min-height:100vh;min-height:100dvh;
   position:relative;overflow-x:hidden;
+  padding-bottom:env(safe-area-inset-bottom,0);
 }
 button{cursor:pointer;font-family:var(--sans);border:none;outline:none;-webkit-tap-highlight-color:transparent;}
 input,select{font-family:var(--sans);outline:none;-webkit-tap-highlight-color:transparent;}
@@ -40,7 +41,7 @@ input,select{font-family:var(--sans);outline:none;-webkit-tap-highlight-color:tr
   html{
     display:flex;align-items:flex-start;justify-content:center;
     padding:28px 0;min-height:100%;
-    background:#bcc5d0 url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><rect width="40" height="40" fill="none"/><circle cx="20" cy="20" r=".6" fill="rgba(0,0,0,.04)"/></svg>');
+    background:#bcc5d0 url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="40" height="40"><rect width="40" height="40" fill="none"/><circle cx="20" cy="20" r=".6" fill="rgba(0,0,0,.04)"/></svg>') !important;
   }
   body{
     border-radius:44px;
@@ -120,23 +121,27 @@ input,select{font-family:var(--sans);outline:none;-webkit-tap-highlight-color:tr
 /* ===== BOTTOM NAVIGATION ===== */
 .bottom-nav{
   position:fixed;bottom:0;left:50%;transform:translateX(-50%);
-  width:100%;max-width:var(--phone-w);height:var(--bottom-nav-h);
-  background:rgba(255,255,255,.92);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  width:100%;max-width:var(--phone-w);
+  height:calc(var(--bottom-nav-h) + env(safe-area-inset-bottom,0));
+  background:rgba(255,255,255,.96);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
   border-top:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-around;
-  z-index:100;padding-bottom:env(safe-area-inset-bottom,0);
+  display:flex;align-items:flex-start;justify-content:space-around;
+  z-index:100;
+  padding-top:6px;
+  padding-bottom:env(safe-area-inset-bottom,0);
 }
 .nav-item{
   background:none;display:flex;flex-direction:column;align-items:center;gap:2px;
-  padding:6px 14px;border-radius:12px;transition:all .2s;min-width:54px;
+  padding:8px 14px;border-radius:12px;transition:all .2s;min-width:54px;
+  min-height:44px;
   color:var(--text-lighter);font-family:var(--sans);
 }
-.nav-item .nav-icon{font-size:1.25rem;line-height:1;transition:all .2s;}
-.nav-item .nav-label{font-size:.6em;font-weight:600;letter-spacing:.3px;text-transform:uppercase;}
+.nav-item .nav-icon{font-size:1.35rem;line-height:1;transition:all .2s;}
+.nav-item .nav-label{font-size:.65em;font-weight:600;letter-spacing:.3px;text-transform:uppercase;}
 .nav-item.active{color:var(--primary);}
 
 /* ===== MAIN CONTENT ===== */
-#app-content{padding-bottom:calc(var(--bottom-nav-h) + 12px);}
+#app-content{padding-bottom:calc(var(--bottom-nav-h) + env(safe-area-inset-bottom,0) + 16px);}
 
 /* ===== SCREENS ===== */
 .screen{
@@ -682,4 +687,68 @@ input,select{font-family:var(--sans);outline:none;-webkit-tap-highlight-color:tr
 /* ===== RESPONSIVE ===== */
 @media(min-width:480px){
   .rec-coverage-grid{grid-template-columns:1fr 1fr 1fr;}
+}
+
+/* ===== MOBILE-SPECIFIC FIXES ===== */
+@media(max-width:499px){
+  /* Remove phone-frame artifacts on real phones */
+  body{
+    max-width:100%;
+    border:none;border-radius:0;box-shadow:none;
+    min-height:100vh;min-height:100dvh;
+    overflow-y:auto;
+  }
+
+  /* Header: fixed at top, respect notch */
+  .app-header{
+    position:sticky;top:0;
+    padding-top:env(safe-area-inset-top,0);
+    padding-left:calc(env(safe-area-inset-left,0) + 18px);
+    padding-right:calc(env(safe-area-inset-right,0) + 18px);
+  }
+
+  /* Content: slightly more padding on small screens */
+  .screen{padding:14px 16px;}
+
+  /* Zip input: larger touch target */
+  .zip-input-group input{
+    padding:16px 18px;font-size:1.1rem;
+  }
+
+  /* Suggestion items: larger touch targets */
+  .suggestion-item{padding:14px 16px;}
+
+  /* Quick cards: ensure tappable */
+  .quick-card{padding:16px;min-height:44px;}
+
+  /* Nav items: ensure 44px minimum touch targets */
+  .nav-item{min-height:48px;min-width:60px;padding:8px 12px;}
+
+  /* Scenario cards: bigger tap area */
+  .scenario-header{padding:14px 16px;}
+
+  /* Builder option buttons: bigger touch target */
+  .opt-btn{padding:10px 14px;font-size:.72rem;}
+
+  /* Back button: bigger touch target */
+  .back-btn{padding:10px 4px;font-size:.85rem;min-height:44px;}
+
+  /* Gap table: slightly larger font for readability */
+  .gap-cell{font-size:.74rem;padding:10px 5px;}
+
+  /* Breakdown rows: taller for touch */
+  .breakdown-row{padding:12px 10px;min-height:44px;}
+
+  /* Modal: full-width bottom sheet on mobile */
+  .modal-content{
+    max-width:100%;
+    border-radius:var(--radius) var(--radius) 0 0;
+    padding-bottom:env(safe-area-inset-bottom,0);
+  }
+
+  /* Notification: respect safe area */
+  .notification{
+    top:calc(env(safe-area-inset-top,0) + 60px);
+    max-width:92%;
+  }
 }
