@@ -215,15 +215,16 @@ const App = {
   // =========================================================================
   renderAnalysis() {
     const data = this.zipData;
+    const container = document.getElementById('screen-results');
     if (!data) {
       this.renderAnalysisEmpty();
       return;
     }
 
+    try {
     const recommendation = InsuranceData.getRecommendation(data.zip, this.vehicleValue);
     if (recommendation) this.selectedTier = recommendation.tier;
 
-    const container = document.getElementById('screen-results');
     const bi = data.avgClaims.bodilyInjury;
     const pd = data.avgClaims.propertyDamage;
     const comp = data.avgClaims.comprehensive;
@@ -367,6 +368,15 @@ const App = {
     }
     this.renderCoverageBreakdownCompact(data);
     this.renderCoverageComparison();
+
+    } catch (err) {
+      container.innerHTML = `
+        <div class="inline-zip-prompt">
+          <h2>Something went wrong</h2>
+          <p>Error rendering analysis: ${err.message}</p>
+          <button class="btn-primary" onclick="App.showScreen('home')">Go Home</button>
+        </div>`;
+    }
   },
 
   switchAnalysisTab(tab) {
