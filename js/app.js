@@ -46,6 +46,13 @@ const App = {
     const appContent = document.getElementById('app-content');
     if (appContent) appContent.scrollTop = 0;
     window.scrollTo(0, 0);
+
+    // Always render screen content on navigation
+    if (screen === 'results') {
+      this.renderAnalysis();
+    } else if (screen === 'builder') {
+      this.renderCustomBuilder();
+    }
   },
 
   handleZipSearch(query) {
@@ -130,7 +137,7 @@ const App = {
           <span class="snapshot-gap-value text-red">$${worstCasePocket.toLocaleString()}</span>
         </div>
         <div class="snapshot-attr">Based on CA statewide claim data (NAIC/CDI), adjusted for ${data.county} County risk factors</div>
-        <button class="btn-primary snapshot-cta" onclick="App.showScreen('results')">See Full Analysis</button>
+        <button class="btn-primary snapshot-cta" onclick="App.showAnalysisScreen()">See Full Analysis</button>
       </div>
     `;
   },
@@ -194,9 +201,7 @@ const App = {
 
   showAnalysisScreen() {
     this.showScreen('results');
-    if (!this.zipData) {
-      this.renderAnalysisEmpty();
-    }
+    this.renderAnalysis();
   },
 
   renderAnalysisEmpty() {
