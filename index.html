@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1e40af">
+  <meta name="description" content="See what accidents actually cost in your California zip code and how much your insurance covers">
+  <title>CA Insurance Coverage Advisor</title>
+  <link rel="manifest" href="manifest.json">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<!-- PHONE STATUS BAR (visible on desktop frame) -->
+<div class="phone-status-bar">
+  <span class="status-time">9:41</span>
+  <div class="dynamic-island"></div>
+  <span class="status-icons">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.24 4.24 0 0 0-6 0zm-4-4l2 2a7.07 7.07 0 0 1 10 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+  </span>
+</div>
+
+<!-- TOP BAR -->
+<header class="app-header">
+  <div class="logo">CA <span>Coverage Advisor</span></div>
+  <div class="header-right">
+    <div class="header-icon">CA</div>
+  </div>
+</header>
+
+<!-- MAIN CONTENT -->
+<div id="app-content">
+
+  <!-- ===== HOME SCREEN ===== -->
+  <div id="screen-home" class="screen active">
+    <div class="hero">
+      <h2>What Would an Accident Cost You?</h2>
+      <p>This app uses California DOI and NAIC claim data, adjusted by county and zip code risk factors, to show what accidents actually cost in your area — and how much your insurance covers.</p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-value">$51,635</div>
+          <div class="hero-stat-label">CA avg bodily injury claim — 2x the national average</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-value">16.6%</div>
+          <div class="hero-stat-label">CA drivers with no insurance at all</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="zip-input-group">
+      <input type="tel" id="zipInput" placeholder="Enter zip code (e.g. 91604)"
+             maxlength="5" autocomplete="off" inputmode="numeric">
+      <div id="zipSuggestions" class="zip-suggestions"></div>
+    </div>
+
+    <div id="zipSnapshot"></div>
+
+    <div class="vehicle-section">
+      <h3>Your Vehicle's Estimated Value</h3>
+      <div class="vehicle-value-display" id="vehicleValueDisplay">$15,000</div>
+      <input type="range" class="vehicle-slider" id="vehicleValue"
+             min="2000" max="100000" step="1000" value="15000"
+             oninput="App.updateVehicleValue(this.value)">
+      <div class="slider-labels">
+        <span>$2K</span>
+        <span>$25K</span>
+        <span>$50K</span>
+        <span>$75K</span>
+        <span>$100K</span>
+      </div>
+    </div>
+
+    <div id="recentSearches" class="recent-searches" style="display:none"></div>
+
+    <div class="quick-cards">
+      <button class="quick-card" onclick="App.showScreen('guide')">
+        <div class="qc-icon">&#128218;</div>
+        <div class="qc-title">Coverage Guide</div>
+        <div class="qc-desc">Learn about each type</div>
+      </button>
+      <button class="quick-card" onclick="App.showScreen('builder')">
+        <div class="qc-icon">&#128295;</div>
+        <div class="qc-title">Build Your Policy</div>
+        <div class="qc-desc">Customize coverage</div>
+      </button>
+    </div>
+
+    <div class="ca-requirements">
+      <h3>California Minimum Requirements (SB 1107, current)</h3>
+      <div class="req-list">
+        <div class="req-item">
+          <span>Bodily Injury Liability</span>
+          <span class="req-value">$30K / $60K</span>
+        </div>
+        <div class="req-item">
+          <span>Property Damage Liability</span>
+          <span class="req-value">$15,000</span>
+        </div>
+        <div class="req-item">
+          <span>Uninsured Motorist BI</span>
+          <span class="req-value">$30K / $60K *</span>
+        </div>
+        <div class="req-item" style="font-size:0.7rem; color:#92400e; margin-top:4px">
+          * Can be rejected in writing. Minimums increase again Jan 1, 2035 to $50K/$100K BI, $25K PD.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== RESULTS SCREEN (built dynamically by app.js) ===== -->
+  <div id="screen-results" class="screen">
+    <!-- Content rendered by App.renderAnalysis() -->
+  </div>
+
+  <!-- ===== COVERAGE GUIDE SCREEN ===== -->
+  <div id="screen-guide" class="screen">
+    <button class="back-btn" onclick="App.showScreen('home')">&#8249; Back</button>
+
+    <div class="guide-header">
+      <h2>Coverage Guide</h2>
+      <p>Understand each type of auto insurance coverage and what it protects.</p>
+    </div>
+
+    <div class="ca-requirements">
+      <h3>California Minimum Requirements (SB 1107, current)</h3>
+      <div class="req-list">
+        <div class="req-item">
+          <span>Bodily Injury Liability</span>
+          <span class="req-value">$30,000 / $60,000</span>
+        </div>
+        <div class="req-item">
+          <span>Property Damage Liability</span>
+          <span class="req-value">$15,000</span>
+        </div>
+        <div class="req-item">
+          <span>Uninsured Motorist BI</span>
+          <span class="req-value">$30,000 / $60,000</span>
+        </div>
+        <div class="req-item" style="font-size:0.72rem; color:#92400e; margin-top:6px">
+          Minimums doubled/tripled per SB 1107. Next increase: Jan 1, 2035 to $50K/$100K BI, $25K PD.
+        </div>
+      </div>
+    </div>
+
+    <div id="coverageGuideList"></div>
+  </div>
+
+  <!-- ===== BUILDER SCREEN ===== -->
+  <div id="screen-builder" class="screen">
+    <button class="back-btn" onclick="App.showScreen(App.zipData ? 'results' : 'home')">&#8249; Back</button>
+    <div id="customBuilder"></div>
+  </div>
+
+</div><!-- end #app-content -->
+
+<!-- ===== MODAL ===== -->
+<div id="coverageModal" class="modal-overlay" onclick="if(event.target===this) App.closeModal()"></div>
+
+<!-- ===== BOTTOM NAVIGATION ===== -->
+<nav class="bottom-nav">
+  <button class="nav-item active" data-nav="home">
+    <span class="nav-icon">&#127968;</span>
+    <span class="nav-label">Home</span>
+  </button>
+  <button class="nav-item" data-nav="results" onclick="if(!App.zipData){App.showNotification('Enter a zip code first','info');return;}">
+    <span class="nav-icon">&#128202;</span>
+    <span class="nav-label">Analysis</span>
+  </button>
+  <button class="nav-item" data-nav="guide">
+    <span class="nav-icon">&#128218;</span>
+    <span class="nav-label">Guide</span>
+  </button>
+  <button class="nav-item" data-nav="builder" onclick="App.renderCustomBuilder()">
+    <span class="nav-icon">&#128295;</span>
+    <span class="nav-label">Builder</span>
+  </button>
+</nav>
+
+<!-- HOME BAR (visible in phone frame) -->
+<div class="phone-home-bar"></div>
+
+<!-- Scripts -->
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
