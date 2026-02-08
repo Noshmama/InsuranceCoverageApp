@@ -678,6 +678,18 @@ input,select{font-family:var(--sans);outline:none;-webkit-tap-highlight-color:tr
   border-radius:8px;color:var(--primary-dark);font-weight:600;white-space:nowrap;
 }
 
+/* ===== INLINE ZIP PROMPT ===== */
+.inline-zip-prompt{
+  text-align:center;padding:40px 16px 20px;
+}
+.inline-zip-prompt h2{
+  font-size:1.15rem;font-weight:800;color:var(--primary-dark);margin-bottom:6px;
+}
+.inline-zip-prompt p{
+  font-size:.78rem;color:var(--text-light);margin-bottom:18px;line-height:1.5;
+}
+.inline-zip-prompt .zip-input-group{margin:0 auto;max-width:300px;}
+
 /* ===== DATA ATTRIBUTION ===== */
 .data-attribution{
   font-size:.55rem;color:var(--text-lighter);text-align:center;

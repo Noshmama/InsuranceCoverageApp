@@ -72,8 +72,10 @@ const App = {
   },
 
   analyzeZip(zip) {
-    document.getElementById('zipInput').value = zip;
-    document.getElementById('zipSuggestions').style.display = 'none';
+    const homeInput = document.getElementById('zipInput');
+    if (homeInput) homeInput.value = zip;
+    const homeSuggestions = document.getElementById('zipSuggestions');
+    if (homeSuggestions) homeSuggestions.style.display = 'none';
 
     this.zipData = InsuranceData.getZipData(zip);
     if (!this.zipData) {
@@ -83,6 +85,11 @@ const App = {
     this.saveRecentSearch(zip);
     this.renderHomeSnapshot(this.zipData);
     this.renderAnalysis();
+
+    // If on builder screen, re-render it with the new zip data
+    if (this.currentScreen === 'builder') {
+      this.renderCustomBuilder();
+    }
   },
 
   renderHomeSnapshot(data) {
@@ -128,12 +135,85 @@ const App = {
     `;
   },
 
+  // Reusable inline zip input for screens that need a zip before showing data
+  _renderInlineZipInput(screenLabel) {
+    return `
+      <div class="inline-zip-prompt">
+        <h2>Enter Your Zip Code</h2>
+        <p>We need your California zip code to show ${screenLabel}.</p>
+        <div class="zip-input-group">
+          <input type="tel" class="inline-zip-input" placeholder="Enter zip code (e.g. 91604)"
+                 maxlength="5" autocomplete="off" inputmode="numeric">
+          <div class="zip-suggestions inline-zip-suggestions"></div>
+        </div>
+      </div>
+    `;
+  },
+
+  _bindInlineZipInput(container) {
+    const input = container.querySelector('.inline-zip-input');
+    const suggestions = container.querySelector('.inline-zip-suggestions');
+    if (!input || !suggestions) return;
+
+    input.addEventListener('input', (e) => {
+      e.target.value = e.target.value.replace(/\D/g, '').slice(0, 5);
+      const query = e.target.value;
+      if (query.length < 2) {
+        suggestions.innerHTML = '';
+        suggestions.style.display = 'none';
+        return;
+      }
+      const results = InsuranceData.searchZipCodes(query);
+      if (results.length === 0) {
+        suggestions.innerHTML = '<div class="suggestion-item">No matching zip codes found</div>';
+        suggestions.style.display = 'block';
+        return;
+      }
+      suggestions.innerHTML = results.map(r =>
+        `<div class="suggestion-item" data-zip="${r.zip}">
+          <span class="suggestion-zip">${r.zip}</span>
+          <span class="suggestion-area">${r.area}, ${r.county} Co.</span>
+        </div>`
+      ).join('');
+      suggestions.style.display = 'block';
+      suggestions.querySelectorAll('.suggestion-item[data-zip]').forEach(item => {
+        item.addEventListener('click', () => {
+          this.analyzeZip(item.dataset.zip);
+        });
+      });
+    });
+
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && e.target.value.length === 5) {
+        this.analyzeZip(e.target.value);
+      }
+    });
+
+    input.focus();
+  },
+
+  showAnalysisScreen() {
+    this.showScreen('results');
+    if (!this.zipData) {
+      this.renderAnalysisEmpty();
+    }
+  },
+
+  renderAnalysisEmpty() {
+    const container = document.getElementById('screen-results');
+    container.innerHTML = this._renderInlineZipInput('personalized accident cost analysis');
+    this._bindInlineZipInput(container);
+  },
+
   // =========================================================================
   // MAIN ANALYSIS RENDER — leads with ACCIDENT COST scenarios
   // =========================================================================
   renderAnalysis() {
     const data = this.zipData;
-    if (!data) return;
+    if (!data) {
+      this.renderAnalysisEmpty();
+      return;
+    }
 
     const recommendation = InsuranceData.getRecommendation(data.zip, this.vehicleValue);
     if (recommendation) this.selectedTier = recommendation.tier;
@@ -648,7 +728,8 @@ const App = {
     const container = document.getElementById('customBuilder');
     if (!container) return;
     if (!this.zipData) {
-      container.innerHTML = `<div class="builder-empty"><p>Enter your zip code first to get personalized coverage recommendations.</p><button class="btn-primary" onclick="App.showScreen('home')">Enter Zip Code</button></div>`;
+      container.innerHTML = this._renderInlineZipInput('personalized coverage recommendations');
+      this._bindInlineZipInput(container);
       return;
     }
     const coverageOptions = {
