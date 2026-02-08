@@ -113,7 +113,7 @@ const App = {
     const pd = data.avgClaims.propertyDamage;
     const coll = data.avgClaims.collision;
     const avgAccidentCost = bi + pd + coll;
-    const worstCasePocket = Math.max(0, bi - 30000) + Math.max(0, pd - 15000) + coll;
+    const worstCasePocket = Math.max(0, bi - 30000) + Math.max(0, pd - 15000) + this.vehicleValue;
     const riskLevel = data.riskLevel;
 
     container.innerHTML = `
@@ -290,10 +290,10 @@ const App = {
               <div class="gap-cell gap-danger-cell"><strong class="${pd > 15000 ? 'text-red' : 'text-green'}">$${Math.max(0, pd - 15000).toLocaleString()}</strong></div>
             </div>
             <div class="gap-row">
-              <div class="gap-cell gap-label-cell">Collision<br><span class="gap-sub">your car</span></div>
-              <div class="gap-cell"><strong>$${coll.toLocaleString()}</strong></div>
+              <div class="gap-cell gap-label-cell">Collision<br><span class="gap-sub">your car ($${this.vehicleValue.toLocaleString()})</span></div>
+              <div class="gap-cell"><strong>$${this.vehicleValue.toLocaleString()}</strong></div>
               <div class="gap-cell">$0</div>
-              <div class="gap-cell gap-danger-cell"><strong class="text-red">$${coll.toLocaleString()}</strong></div>
+              <div class="gap-cell gap-danger-cell"><strong class="text-red">$${this.vehicleValue.toLocaleString()}</strong></div>
             </div>
             <div class="gap-row">
               <div class="gap-cell gap-label-cell">Comprehensive<br><span class="gap-sub">theft/vandalism</span></div>
@@ -305,7 +305,7 @@ const App = {
               <div class="gap-cell gap-label-cell"><strong>Worst-Case Total</strong></div>
               <div class="gap-cell"></div>
               <div class="gap-cell"></div>
-              <div class="gap-cell gap-danger-cell"><strong class="text-red big-number">$${(Math.max(0,bi-30000) + Math.max(0,pd-15000) + coll + comp).toLocaleString()}</strong></div>
+              <div class="gap-cell gap-danger-cell"><strong class="text-red big-number">$${(Math.max(0,bi-30000) + Math.max(0,pd-15000) + this.vehicleValue + comp).toLocaleString()}</strong></div>
             </div>
           </div>
         </div>
@@ -884,15 +884,7 @@ const App = {
     const display = document.getElementById('vehicleValueDisplay');
     if (display) display.textContent = '$' + this.vehicleValue.toLocaleString();
     if (this.zipData) {
-      const rec = InsuranceData.getRecommendation(this.zipData.zip, this.vehicleValue);
-      if (rec) {
-        this.selectedTier = rec.tier;
-        this.renderRecommendation(rec);
-        if (document.querySelector('.breakdown-compact-list')) {
-          this.renderCoverageBreakdownCompact(this.zipData);
-        }
-        this.renderCoverageComparison();
-      }
+      this.renderAnalysis();
     }
   }
 };
